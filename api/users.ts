@@ -1,8 +1,6 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+let utenti: { name: string; email: string }[] = [];
 
-let utenti: any[] = [];
-
-export default function handler(req: VercelRequest, res: VercelResponse) {
+export default function handler(req: any, res: any) {
   if (req.method === 'POST') {
     try {
       const { users } = req.body;
