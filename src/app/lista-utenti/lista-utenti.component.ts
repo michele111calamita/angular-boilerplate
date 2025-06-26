@@ -77,18 +77,40 @@ export class ListaUtentiComponent implements OnInit {
 
   ngOnInit() {
     fetch('/api/users')
-      .then(res => res.json())
-      .then(data => this.users = data);
+      .then(res => {
+        if (!res.ok) throw new Error('Errore durante il recupero utenti');
+        return res.json();
+      })
+      .then(data => {
+        this.users = data;
+      })
+      .catch(err => {
+        console.error('GET utenti fallito:', err);
+      });
   }
 
   addUser() {
     if (!this.newUser.name || !this.newUser.email) return;
     this.users.push({ ...this.newUser });
     this.newUser = { name: '', email: '' };
+    this.saveUsers();
+  }
+
+  saveUsers() {
     fetch('/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ users: this.users })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Errore nel salvataggio utenti');
+      return res.json();
+    })
+    .then(data => {
+      console.log('Utenti salvati:', data);
+    })
+    .catch(err => {
+      console.error('POST utenti fallito:', err);
     });
   }
 
@@ -108,11 +130,14 @@ export class ListaUtentiComponent implements OnInit {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ users: this.selected })
     }).then(async res => {
+      if (!res.ok) throw new Error('Errore durante l\'esportazione');
       const blob = await res.blob();
       const a = document.createElement('a');
       a.href = window.URL.createObjectURL(blob);
       a.download = 'lista_trasferta.xlsx';
       a.click();
+    }).catch(err => {
+      console.error('Errore export:', err);
     });
   }
 }
