@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
@@ -27,37 +27,67 @@ import { MatDividerModule } from '@angular/material/divider';
     MatDividerModule
   ],
   template: `
-    <div class="container">
+    <div class="container p-0">
       <mat-card class="card">
-        <h1>📥 Importa Utenti da Excel</h1>
-
-        <input type="file" (change)="onFileChange($event)" accept=".xlsx, .xls" />
+        <h1>👥 Lista Utenti Precaricati</h1>
 
         <div *ngIf="error" class="error">{{ error }}</div>
 
-        <mat-form-field class="field" appearance="outline">
-          <mat-label>Nome</mat-label>
-          <input matInput [(ngModel)]="newUser.name" />
-        </mat-form-field>
+        <form (ngSubmit)="addUser()" #userForm="ngForm">
+          <mat-form-field class="field" appearance="fill">
+            <mat-label>Cognome</mat-label>
+            <input matInput [(ngModel)]="newUser.cognome" name="cognome" required />
+          </mat-form-field>
+          <mat-form-field class="field" appearance="fill">
+            <mat-label>Nome</mat-label>
+            <input matInput [(ngModel)]="newUser.nome" name="nome" required />
+          </mat-form-field>
+          <mat-form-field class="field" appearance="fill">
+            <mat-label>Data di nascita</mat-label>
+            <input matInput [(ngModel)]="newUser.dataNascita" name="dataNascita" />
+          </mat-form-field>
+          <mat-form-field class="field" appearance="fill">
+            <mat-label>Luogo di nascita</mat-label>
+            <input matInput [(ngModel)]="newUser.luogoNascita" name="luogoNascita" />
+          </mat-form-field>
+          <mat-form-field class="field" appearance="fill">
+            <mat-label>Codice fiscale</mat-label>
+            <input matInput [(ngModel)]="newUser.codiceFiscale" name="codiceFiscale" required />
+          </mat-form-field>
+          <mat-form-field class="field" appearance="fill">
+            <mat-label>Numero tessera</mat-label>
+            <input matInput [(ngModel)]="newUser.numeroTessera" name="numeroTessera" />
+          </mat-form-field>
+          <mat-form-field class="field" appearance="fill">
+            <mat-label>Codice sicurezza</mat-label>
+            <input matInput [(ngModel)]="newUser.codiceSicurezza" name="codiceSicurezza" />
+          </mat-form-field>
 
-        <mat-form-field class="field" appearance="outline">
-          <mat-label>Email</mat-label>
-          <input matInput [(ngModel)]="newUser.email" />
-        </mat-form-field>
-
-        <button mat-flat-button color="primary" (click)="addUser()" [disabled]="!newUser.name || !newUser.email">
-          Aggiungi Utente
-        </button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="!userForm.form.valid">Aggiungi Utente</button>
+        </form>
 
         <mat-divider class="divider"></mat-divider>
 
-        <mat-list *ngIf="users.length">
-          <mat-list-item *ngFor="let user of users">
-            <mat-checkbox (change)="toggleSelection(user)" [checked]="isSelected(user)">
-              {{ user.name }} — {{ user.email }}
-            </mat-checkbox>
-          </mat-list-item>
-        </mat-list>
+        <mat-list-item *ngFor="let user of users" class="user-item">
+  <mat-checkbox (change)="toggleSelection(user)" [checked]="isSelected(user)">
+    <div class="user-details">
+      <div class="user-name">👤 {{ user.cognome }} {{ user.nome }}</div>
+      <div class="user-meta">
+        <div class="user-row">
+          <div><strong>📇 CF:</strong> {{ user.codiceFiscale }}</div>
+          <div><strong>🎂 Nascita:</strong> {{ user.dataNascita }}</div>
+          <div><strong>📍 Luogo:</strong> {{ user.luogoNascita }}</div>
+        </div>
+        <div class="user-row">
+          <div><strong>🪪 Tessera:</strong> {{ user.numeroTessera }}</div>
+          <div><strong>🔐 Sicurezza:</strong> {{ user.codiceSicurezza }}</div>
+        </div>
+      </div>
+    </div>
+  </mat-checkbox>
+</mat-list-item>
+
+
 
         <button mat-raised-button color="accent" class="export-btn"
                 (click)="exportLista()" [disabled]="!selected.length">
@@ -66,63 +96,106 @@ import { MatDividerModule } from '@angular/material/divider';
       </mat-card>
     </div>
   `,
-  styles: [`
-    .container { max-width: 600px; margin: auto; padding: 16px; }
-    .card { padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .divider { margin: 16px 0; }
-    .export-btn { margin-top: 12px; }
-    .field { width: 100%; margin-top: 12px; }
-    .error { color: red; margin-top: 8px; }
-  `]
+  styles: [
+    `.container { width:100svw; margin: 0px; padding: 0px; }
+     .card { padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+     .divider { margin: 16px 0; }
+     .export-btn { margin-top: 12px; }
+     .error { color: red; margin-top: 8px; }
+     .field { display: block; margin-bottom: 12px; width: 100%; }
+     .user-item {
+    padding: 16px;
+    border-bottom: 1px solid #444;
+    background-color: #121212;
+    color: #eee;
+  }
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .user-name {
+    font-weight: 600;
+    font-size: 18px;
+    color: #fff;
+  }
+
+  .user-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .user-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 14px;
+    color: #ccc;
+  }
+
+  mat-checkbox .mat-checkbox-label {
+    color: inherit;
+  }
+     
+     `
+
+     
+  ]
 })
-export class ListaUtentiComponent {
-  users: { name: string; email: string }[] = [];
-  selected: { name: string; email: string }[] = [];
-  newUser = { name: '', email: '' };
+export class ListaUtentiComponent implements OnInit {
+  users: any[] = [];
+  selected: any[] = [];
   error: string = '';
+  newUser: any = {
+    cognome: '', nome: '', dataNascita: '', luogoNascita: '',
+    codiceFiscale: '', numeroTessera: '', codiceSicurezza: ''
+  };
 
-  onFileChange(evt: any) {
-    const target: DataTransfer = <DataTransfer>(evt.target);
-    if (target.files.length !== 1) return;
+  ngOnInit(): void {
+    fetch('assets/utenti_precaricati.xlsx')
+      .then(res => res.arrayBuffer())
+      .then(arrayBuffer => {
+        const wb: XLSX.WorkBook = XLSX.read(arrayBuffer, { type: 'array' });
+        const wsname: string = wb.SheetNames[0];
+        const ws: XLSX.WorkSheet = wb.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws);
 
-    const reader: FileReader = new FileReader();
-    reader.onload = (e: any) => {
-      const bstr: string = e.target.result;
-      const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
-      const wsname: string = wb.SheetNames[0];
-      const ws: XLSX.WorkSheet = wb.Sheets[wsname];
-
-      const data = XLSX.utils.sheet_to_json(ws, { header: 1 }) as string[][];
-      const [header, ...rows] = data;
-      const nameIdx = header.findIndex(h => h.toLowerCase().includes('nome') || h.toLowerCase().includes('name'));
-      const emailIdx = header.findIndex(h => h.toLowerCase().includes('email'));
-
-      if (nameIdx === -1 || emailIdx === -1) {
-        this.error = 'Intestazioni non valide. Assicurati che il file contenga "Nome" e "Email"';
-        return;
-      }
-
-      this.users = rows
-        .filter(row => row[nameIdx] && row[emailIdx])
-        .map(row => ({ name: row[nameIdx], email: row[emailIdx] }));
-      this.error = '';
-    };
-    reader.readAsBinaryString(target.files[0]);
+        this.users = data.map((row: any) => ({
+          cognome: row['Cognome'] || '',
+          nome: row['Nome'] || '',
+          dataNascita: row['Data di nascita'] || '',
+          luogoNascita: row['Luogo di nascita'] || '',
+          codiceFiscale: row['Codice fiscale'] || '',
+          numeroTessera: row['Numero tessera'] || '',
+          codiceSicurezza: row['Codice sicurezza'] || ''
+        }));
+      })
+      .catch(err => {
+        console.error('Errore nel caricamento Excel:', err);
+        this.error = 'Impossibile caricare il file utenti_precaricati.xlsx';
+      });
   }
 
   toggleSelection(user: any) {
-    const idx = this.selected.findIndex(u => u.email === user.email);
+    const idx = this.selected.findIndex(u => u.codiceFiscale === user.codiceFiscale);
     if (idx >= 0) this.selected.splice(idx, 1);
     else this.selected.push(user);
   }
 
   isSelected(user: any): boolean {
-    return this.selected.some(u => u.email === user.email);
+    return this.selected.some(u => u.codiceFiscale === user.codiceFiscale);
   }
 
   addUser() {
     this.users.push({ ...this.newUser });
-    this.newUser = { name: '', email: '' };
+    this.newUser = {
+      cognome: '', nome: '', dataNascita: '', luogoNascita: '',
+      codiceFiscale: '', numeroTessera: '', codiceSicurezza: ''
+    };
   }
 
   exportLista() {
