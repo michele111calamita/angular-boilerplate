@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ImportUtentiComponent } from './import-utenti/import-utenti.component';
 import { ListaUtentiComponent } from './lista-utenti/lista-utenti.component';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -11,4 +12,13 @@ import { ListaUtentiComponent } from './lista-utenti/lista-utenti.component';
 })
 export class AppComponent {
   title = 'angular-test';
+  constructor(private router: Router) {}
+
+  ngOnInit() {
+    const isAuth = localStorage.getItem('auth') === 'true';
+    if (!isAuth) {
+      this.router.navigate(['/login']);
+    }
+  }
+  
 }
