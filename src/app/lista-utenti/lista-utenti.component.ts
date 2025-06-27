@@ -25,85 +25,94 @@ import { MatDividerModule } from '@angular/material/divider';
     MatDividerModule
   ],
   template: `
-    <div class="container">
-      <mat-card class="card">
-        <div class="flex w-full ">
-          <img src="assets/logo.png" alt="Logo" class=" flex w-full" />
-        </div>
-        <h1 class="title">CREA LISTA TRASFERTE 40+</h1>
+  <div class="container">
+  <mat-card class="card">
+    <div class="w-full flex ">
+      <img src="assets/logo.png" alt="Logo" class="flex w-full" />
+    </div>
+    <h1 class="title">CREA LISTA TRASFERTE 40+</h1>
 
-        <div *ngIf="error" class="error">{{ error }}</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
 
-        <button mat-raised-button color="primary" class="mb-3" (click)="toggleForm()">
-          <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
-          {{ showForm ? 'Chiudi Form' : 'Aggiungi Utente' }}
-        </button>
+    <button mat-raised-button color="primary" (click)="toggleForm()">
+      <mat-icon>{{ showForm ? 'close' : (editMode ? 'edit' : 'add') }}</mat-icon>
+      {{ showForm ? 'Chiudi Form' : (editMode ? 'Modifica Utente' : 'Aggiungi Utente') }}
+    </button>
 
-        <form *ngIf="showForm" (ngSubmit)="addUser()" #userForm="ngForm">
-          <mat-form-field class="field"><mat-label>Cognome</mat-label>
-            <input matInput name="cognome" [(ngModel)]="newUser.cognome" required />
-          </mat-form-field>
-          <mat-form-field class="field"><mat-label>Nome</mat-label>
-            <input matInput name="nome" [(ngModel)]="newUser.nome" required />
-          </mat-form-field>
-          <mat-form-field class="field"><mat-label>Data di nascita</mat-label>
-            <input matInput name="dataNascita" [(ngModel)]="newUser.dataNascita" />
-          </mat-form-field>
-          <mat-form-field class="field"><mat-label>Luogo di nascita</mat-label>
-            <input matInput name="luogoNascita" [(ngModel)]="newUser.luogoNascita" />
-          </mat-form-field>
-          <mat-form-field class="field"><mat-label>Codice fiscale</mat-label>
-            <input matInput name="codiceFiscale" [(ngModel)]="newUser.codiceFiscale" required />
-          </mat-form-field>
-          <mat-form-field class="field"><mat-label>Numero tessera</mat-label>
-            <input matInput name="numeroTessera" [(ngModel)]="newUser.numeroTessera" />
-          </mat-form-field>
-          <mat-form-field class="field"><mat-label>Codice sicurezza</mat-label>
-            <input matInput name="codiceSicurezza" [(ngModel)]="newUser.codiceSicurezza" />
-          </mat-form-field>
+    <form *ngIf="showForm" (ngSubmit)="addUser()" #userForm="ngForm">
+      <mat-form-field class="field"><mat-label>Cognome</mat-label>
+        <input matInput name="cognome" [(ngModel)]="newUser.cognome" required />
+      </mat-form-field>
+      <mat-form-field class="field"><mat-label>Nome</mat-label>
+        <input matInput name="nome" [(ngModel)]="newUser.nome" required />
+      </mat-form-field>
+      <mat-form-field class="field"><mat-label>Data di nascita</mat-label>
+        <input matInput name="dataNascita" [(ngModel)]="newUser.dataNascita" />
+      </mat-form-field>
+      <mat-form-field class="field"><mat-label>Luogo di nascita</mat-label>
+        <input matInput name="luogoNascita" [(ngModel)]="newUser.luogoNascita" />
+      </mat-form-field>
+      <mat-form-field class="field"><mat-label>Codice fiscale</mat-label>
+        <input matInput name="codiceFiscale" [(ngModel)]="newUser.codiceFiscale" required />
+      </mat-form-field>
+      <mat-form-field class="field"><mat-label>Numero tessera</mat-label>
+        <input matInput name="numeroTessera" [(ngModel)]="newUser.numeroTessera" />
+      </mat-form-field>
+      <mat-form-field class="field"><mat-label>Codice sicurezza</mat-label>
+        <input matInput name="codiceSicurezza" [(ngModel)]="newUser.codiceSicurezza" />
+      </mat-form-field>
 
-          <button mat-raised-button color="primary" type="submit" [disabled]="!userForm.form.valid">
-            Salva Utente
-          </button>
-        </form>
+      <button mat-raised-button color="primary" type="submit" [disabled]="!userForm.form.valid">
+        {{ editMode ? 'Salva Modifiche' : 'Aggiungi Utente' }}
+      </button>
+    </form>
 
-        <mat-divider class="divider"></mat-divider>
+    <mat-divider class="divider"></mat-divider>
 
-        <mat-form-field appearance="fill" class="field">
-          <mat-label>Cerca</mat-label>
-          <input matInput [(ngModel)]="searchTerm" placeholder="Cerca..." />
-        </mat-form-field>
+    <mat-form-field appearance="fill" class="field">
+      <mat-label>Cerca</mat-label>
+      <input matInput [(ngModel)]="searchTerm" placeholder="Cerca..." />
+    </mat-form-field>
 
-        <div class="user-list-scroll">
-          <div *ngFor="let user of filteredUsers(); trackBy: trackByUserId" class="user-item">
-            <mat-checkbox
-              [checked]="isSelected(user.id)"
-              (change)="onCheckboxChange($event.checked, user.id)">
-            </mat-checkbox>
+    <div class="user-list-scroll">
+      <div *ngFor="let user of filteredUsers(); trackBy: trackByUserId" class="user-item">
+        <mat-checkbox
+          [checked]="isSelected(user.id)"
+          (change)="onCheckboxChange($event.checked, user.id)">
+        </mat-checkbox>
 
-            <div class="user-details">
-              <div class="user-name">👤 {{ user.cognome }} {{ user.nome }}</div>
-              <div class="user-meta">
-                <div class="user-row">
-                  <div><strong>📇 CF:</strong> {{ user.codiceFiscale }}</div>
-                  <div><strong>🎂 Nascita:</strong> {{ user.dataNascita }}</div>
-                  <div><strong>📍 Luogo:</strong> {{ user.luogoNascita }}</div>
-                </div>
-                <div class="user-row">
-                  <div><strong>🪪 Tessera:</strong> {{ user.numeroTessera }}</div>
-                  <div><strong>🔐 Sicurezza:</strong> {{ user.codiceSicurezza }}</div>
-                </div>
-              </div>
+        <div class="user-details">
+          <div class="user-name">👤 {{ user.cognome }} {{ user.nome }}</div>
+          <div class="user-meta">
+            <div class="user-row">
+              <div><strong>📇 CF:</strong> {{ user.codiceFiscale }}</div>
+              <div><strong>🎂 Nascita:</strong> {{ user.dataNascita }}</div>
+              <div><strong>📍 Luogo:</strong> {{ user.luogoNascita }}</div>
+            </div>
+            <div class="user-row">
+              <div><strong>🪪 Tessera:</strong> {{ user.numeroTessera }}</div>
+              <div><strong>🔐 Sicurezza:</strong> {{ user.codiceSicurezza }}</div>
             </div>
           </div>
         </div>
 
-        <button mat-raised-button color="accent" class="export-btn"
-                (click)="exportLista()" [disabled]="!selected.length">
-          <mat-icon>download</mat-icon> Esporta Lista
-        </button>
-      </mat-card>
+        <div class="actions">
+          <button mat-icon-button color="accent" (click)="editUser(user)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteUser(user.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
     </div>
+
+    <button mat-raised-button color="accent" class="export-btn"
+            (click)="exportLista()" [disabled]="!selected.length">
+      <mat-icon>download</mat-icon> Esporta Lista
+    </button>
+  </mat-card>
+</div>
   `,
   styles: [`
     .container { width: 100vw; margin: 0; padding: 0; }
@@ -144,7 +153,9 @@ export class ListaUtentiComponent implements OnInit {
   error = '';
   searchTerm = '';
   showForm = false;
+  editMode = false;
   userIdCounter = 0;
+  editingUserId: number | null = null;
 
   newUser = {
     cognome: '', nome: '', dataNascita: '', luogoNascita: '',
@@ -152,44 +163,81 @@ export class ListaUtentiComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    fetch('assets/utenti_precaricati.xlsx')
-      .then(res => res.arrayBuffer())
-      .then(arrayBuffer => {
-        const wb = XLSX.read(arrayBuffer, { type: 'array' });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const data = XLSX.utils.sheet_to_json(ws);
+    const saved = localStorage.getItem('utenti');
+    if (saved) {
+      this.users = JSON.parse(saved);
+      this.userIdCounter = this.users.reduce((max, u) => u.id > max ? u.id : max, 0) + 1;
+    } else {
+      fetch('assets/utenti_precaricati.xlsx')
+        .then(res => res.arrayBuffer())
+        .then(arrayBuffer => {
+          const wb = XLSX.read(arrayBuffer, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const data = XLSX.utils.sheet_to_json(ws);
 
-        this.users = (data as any[]).map((row: any) => ({
-          id: this.userIdCounter++,
-          cognome: row['Cognome'] || '',
-          nome: row['Nome'] || '',
-          dataNascita: row['Data di nascita'] || '',
-          luogoNascita: row['Luogo di nascita'] || '',
-          codiceFiscale: row['Codice fiscale'] || '',
-          numeroTessera: row['Numero tessera'] || '',
-          codiceSicurezza: row['Codice sicurezza'] || ''
-        }));
-      })
-      .catch(err => {
-        console.error('Errore nel caricamento Excel:', err);
-        this.error = 'Impossibile caricare il file utenti_precaricati.xlsx';
-      });
+          this.users = (data as any[]).map((row: any) => ({
+            id: this.userIdCounter++,
+            cognome: row['Cognome'] || '',
+            nome: row['Nome'] || '',
+            dataNascita: row['Data di nascita'] || '',
+            luogoNascita: row['Luogo di nascita'] || '',
+            codiceFiscale: row['Codice fiscale'] || '',
+            numeroTessera: row['Numero tessera'] || '',
+            codiceSicurezza: row['Codice sicurezza'] || ''
+          }));
+
+          this.saveToLocalStorage();
+        })
+        .catch(err => {
+          console.error('Errore nel caricamento Excel:', err);
+          this.error = 'Impossibile caricare il file utenti_precaricati.xlsx';
+        });
+    }
+  }
+
+  saveToLocalStorage() {
+    localStorage.setItem('utenti', JSON.stringify(this.users));
   }
 
   toggleForm() {
     this.showForm = !this.showForm;
+    if (!this.showForm) this.resetForm();
   }
 
-  addUser() {
-    this.users.push({
-      id: this.userIdCounter++,
-      ...this.newUser
-    });
+  resetForm() {
     this.newUser = {
       cognome: '', nome: '', dataNascita: '', luogoNascita: '',
       codiceFiscale: '', numeroTessera: '', codiceSicurezza: ''
     };
+    this.editingUserId = null;
+    this.editMode = false;
+  }
+
+  addUser() {
+    if (this.editMode && this.editingUserId !== null) {
+      const index = this.users.findIndex(u => u.id === this.editingUserId);
+      if (index !== -1) {
+        this.users[index] = { id: this.editingUserId, ...this.newUser };
+      }
+    } else {
+      this.users.push({ id: this.userIdCounter++, ...this.newUser });
+    }
+    this.saveToLocalStorage();
+    this.resetForm();
     this.showForm = false;
+  }
+
+  editUser(user: any) {
+    this.newUser = { ...user };
+    this.editingUserId = user.id;
+    this.editMode = true;
+    this.showForm = true;
+  }
+
+  deleteUser(id: number) {
+    this.users = this.users.filter(u => u.id !== id);
+    this.selected = this.selected.filter(s => s !== String(id));
+    this.saveToLocalStorage();
   }
 
   onCheckboxChange(checked: boolean, id: number) {
