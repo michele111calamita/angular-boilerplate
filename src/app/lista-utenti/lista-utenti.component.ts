@@ -200,8 +200,22 @@ export class ListaUtentiComponent implements OnInit {
 
   exportLista() {
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.selected);
+  
+    // Imposta larghezza colonne per leggibilità
+    const columnWidths = [
+      { wch: 15 }, // Cognome
+      { wch: 15 }, // Nome
+      { wch: 15 }, // Data di nascita
+      { wch: 20 }, // Luogo di nascita
+      { wch: 20 }, // Codice fiscale
+      { wch: 15 }, // Numero tessera
+      { wch: 20 }, // Codice sicurezza
+    ];
+    ws['!cols'] = columnWidths;
+  
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'ListaTrasferta');
     XLSX.writeFile(wb, 'lista_trasferta.xlsx');
   }
+  
 }
