@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import * as XLSX from 'xlsx';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -28,25 +29,29 @@ import { MatDividerModule } from '@angular/material/divider';
   template: `
     <div class="container">
       <mat-card class="card">
-        <h1>👥 Gestione Utenti</h1>
+        <h1>📥 Importa Utenti da Excel</h1>
 
-        <form class="form" (ngSubmit)="addUser()" #f="ngForm">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nome</mat-label>
-            <input matInput [(ngModel)]="newUser.name" name="name" required />
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Email</mat-label>
-            <input matInput [(ngModel)]="newUser.email" name="email" required email />
-          </mat-form-field>
-          <button mat-flat-button color="primary" type="submit" [disabled]="f.invalid">
-            <mat-icon>person_add</mat-icon> Aggiungi Utente
-          </button>
-        </form>
+        <input type="file" (change)="onFileChange($event)" accept=".xlsx, .xls" />
+
+        <div *ngIf="error" class="error">{{ error }}</div>
+
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Nome</mat-label>
+          <input matInput [(ngModel)]="newUser.name" />
+        </mat-form-field>
+
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput [(ngModel)]="newUser.email" />
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" (click)="addUser()" [disabled]="!newUser.name || !newUser.email">
+          Aggiungi Utente
+        </button>
 
         <mat-divider class="divider"></mat-divider>
 
-        <mat-list>
+        <mat-list *ngIf="users.length">
           <mat-list-item *ngFor="let user of users">
             <mat-checkbox (change)="toggleSelection(user)" [checked]="isSelected(user)">
               {{ user.name }} — {{ user.email }}
@@ -64,54 +69,45 @@ import { MatDividerModule } from '@angular/material/divider';
   styles: [`
     .container { max-width: 600px; margin: auto; padding: 16px; }
     .card { padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
-    .full-width { width: 100%; }
     .divider { margin: 16px 0; }
     .export-btn { margin-top: 12px; }
+    .field { width: 100%; margin-top: 12px; }
+    .error { color: red; margin-top: 8px; }
   `]
 })
-export class ListaUtentiComponent implements OnInit {
-  users: any[] = [];
-  selected: any[] = [];
+export class ListaUtentiComponent {
+  users: { name: string; email: string }[] = [];
+  selected: { name: string; email: string }[] = [];
   newUser = { name: '', email: '' };
+  error: string = '';
 
-  ngOnInit() {
-    fetch('/api/users')
-      .then(res => {
-        if (!res.ok) throw new Error('Errore durante il recupero utenti');
-        return res.json();
-      })
-      .then(data => {
-        this.users = data;
-      })
-      .catch(err => {
-        console.error('GET utenti fallito:', err);
-      });
-  }
+  onFileChange(evt: any) {
+    const target: DataTransfer = <DataTransfer>(evt.target);
+    if (target.files.length !== 1) return;
 
-  addUser() {
-    if (!this.newUser.name || !this.newUser.email) return;
-    this.users.push({ ...this.newUser });
-    this.newUser = { name: '', email: '' };
-    this.saveUsers();
-  }
+    const reader: FileReader = new FileReader();
+    reader.onload = (e: any) => {
+      const bstr: string = e.target.result;
+      const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
+      const wsname: string = wb.SheetNames[0];
+      const ws: XLSX.WorkSheet = wb.Sheets[wsname];
 
-  saveUsers() {
-    fetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ users: this.users })
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('Errore nel salvataggio utenti');
-      return res.json();
-    })
-    .then(data => {
-      console.log('Utenti salvati:', data);
-    })
-    .catch(err => {
-      console.error('POST utenti fallito:', err);
-    });
+      const data = XLSX.utils.sheet_to_json(ws, { header: 1 }) as string[][];
+      const [header, ...rows] = data;
+      const nameIdx = header.findIndex(h => h.toLowerCase().includes('nome') || h.toLowerCase().includes('name'));
+      const emailIdx = header.findIndex(h => h.toLowerCase().includes('email'));
+
+      if (nameIdx === -1 || emailIdx === -1) {
+        this.error = 'Intestazioni non valide. Assicurati che il file contenga "Nome" e "Email"';
+        return;
+      }
+
+      this.users = rows
+        .filter(row => row[nameIdx] && row[emailIdx])
+        .map(row => ({ name: row[nameIdx], email: row[emailIdx] }));
+      this.error = '';
+    };
+    reader.readAsBinaryString(target.files[0]);
   }
 
   toggleSelection(user: any) {
@@ -124,20 +120,15 @@ export class ListaUtentiComponent implements OnInit {
     return this.selected.some(u => u.email === user.email);
   }
 
+  addUser() {
+    this.users.push({ ...this.newUser });
+    this.newUser = { name: '', email: '' };
+  }
+
   exportLista() {
-    fetch('/api/list', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ users: this.selected })
-    }).then(async res => {
-      if (!res.ok) throw new Error('Errore durante l\'esportazione');
-      const blob = await res.blob();
-      const a = document.createElement('a');
-      a.href = window.URL.createObjectURL(blob);
-      a.download = 'lista_trasferta.xlsx';
-      a.click();
-    }).catch(err => {
-      console.error('Errore export:', err);
-    });
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.selected);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'ListaTrasferta');
+    XLSX.writeFile(wb, 'lista_trasferta.xlsx');
   }
 }
