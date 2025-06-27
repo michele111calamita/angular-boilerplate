@@ -10,15 +10,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 
-import { AppComponent } from './app.component';
-import { ImportUtentiComponent } from './import-utenti/import-utenti.component';
-import { ListaUtentiComponent } from './lista-utenti/lista-utenti.component';
+// import { AppComponent } from './app.component';
+// import { ImportUtentiComponent } from './import-utenti/import-utenti.component';
+// import { ListaUtentiComponent } from './lista-utenti/lista-utenti.component';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    ImportUtentiComponent,
-    ListaUtentiComponent
+    // AppComponent,
+    // ImportUtentiComponent,
+    // ListaUtentiComponent
   ],
   imports: [
     BrowserModule,
@@ -33,6 +33,6 @@ import { ListaUtentiComponent } from './lista-utenti/lista-utenti.component';
     MatListModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: []
 })
 export class AppModule { }
