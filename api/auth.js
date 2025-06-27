@@ -2,7 +2,7 @@ export default function handler(req, res) {
     const auth = req.headers.authorization;
   
     if (!auth || !auth.startsWith('Basic ')) {
-      res.setHeader('WWW-Authenticate', 'Basic realm=\"Protected Area\"');
+      res.setHeader('WWW-Authenticate', 'Basic realm="Protected Area"');
       return res.status(401).end('Authentication required.');
     }
   
@@ -10,10 +10,14 @@ export default function handler(req, res) {
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
     const [username, password] = credentials.split(':');
   
-    if (username === 'admin' && password === 'trasferta2025') {
-      return res.status(200).end('Authenticated');
+    const isValid = username === 'admin' && password === 'trasferta2025';
+  
+    if (!isValid) {
+      return res.status(403).end('Access Denied');
     }
   
-    return res.status(403).end('Access Denied');
+    // ✅ Reindirizza alla home dopo login
+    res.writeHead(302, { Location: '/' });
+    res.end();
   }
   
