@@ -163,11 +163,19 @@ export class ListaUtentiComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    const saved = localStorage.getItem('utenti');
-    if (saved) {
-      this.users = JSON.parse(saved);
+    const savedUsers = localStorage.getItem('utenti');
+    const savedSelected = localStorage.getItem('utentiSelezionati');
+
+    if (savedUsers) {
+      this.users = JSON.parse(savedUsers);
       this.userIdCounter = this.users.reduce((max, u) => u.id > max ? u.id : max, 0) + 1;
-    } else {
+    }
+
+    if (savedSelected) {
+      this.selected = JSON.parse(savedSelected);
+    }
+
+    if (!savedUsers) {
       fetch('assets/utenti_precaricati.xlsx')
         .then(res => res.arrayBuffer())
         .then(arrayBuffer => {
@@ -197,6 +205,7 @@ export class ListaUtentiComponent implements OnInit {
 
   saveToLocalStorage() {
     localStorage.setItem('utenti', JSON.stringify(this.users));
+    localStorage.setItem('utentiSelezionati', JSON.stringify(this.selected));
   }
 
   toggleForm() {
@@ -246,6 +255,7 @@ export class ListaUtentiComponent implements OnInit {
     } else {
       this.selected = this.selected.filter(s => s !== String(id));
     }
+    this.saveToLocalStorage();
   }
 
   isSelected(id: number): boolean {
