@@ -27,9 +27,12 @@ import { MatDividerModule } from '@angular/material/divider';
     MatDividerModule
   ],
   template: `
-    <div class="container p-0">
+    <div class="container w-full p-0">
       <mat-card class="card">
-        <h1>👥 Lista Utenti Precaricati</h1>
+      <div class="flex w-full h-full p-3 justify-content-center " >
+  <img src="assets/logo.png" alt="Logo" class="w-full" />
+</div>
+        <h1 class="text-white font-bold text-center w-full">CREA LISTA TRASFERTE 40+</h1>
 
         <div *ngIf="error" class="error">{{ error }}</div>
 
@@ -136,6 +139,11 @@ import { MatDividerModule } from '@angular/material/divider';
     font-size: 14px;
     color: #ccc;
   }
+
+::ng-deep .mat-mdc-card{
+  background-color: black !important;
+}
+
 
   mat-checkbox .mat-checkbox-label {
     color: inherit;
