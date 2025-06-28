@@ -267,11 +267,13 @@ export class ListaUtentiComponent implements OnInit {
   }
 
   filteredUsers(): any[] {
+    if (!this.searchTerm.trim()) return this.users;
     const term = this.searchTerm.toLowerCase();
     return this.users.filter(user =>
-      user.cognome.toLowerCase().includes(term) ||
-      user.nome.toLowerCase().includes(term) ||
-      user.codiceFiscale.toLowerCase().includes(term)
+      String(user.cognome || '').toLowerCase().includes(term) ||
+      String(user.nome || '').toLowerCase().includes(term) ||
+      String(user.codiceFiscale || '').toLowerCase().includes(term) ||
+      String(user.luogoNascita || '').toLowerCase().includes(term)
     );
   }
 
