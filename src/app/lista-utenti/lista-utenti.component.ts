@@ -275,6 +275,8 @@ export class ListaUtentiComponent implements OnInit {
     );
   }
 
+  
+
   exportLista() {
     const lista = this.users.filter(u => this.selected.includes(String(u.id)));
     const ws = XLSX.utils.json_to_sheet(lista);
