@@ -25,16 +25,18 @@ import { MatDividerModule } from '@angular/material/divider';
     MatDividerModule
   ],
   template: `
- <div *ngIf="loading" class="loading-container">
+  <div *ngIf="loading" class="loading-container">
   <img src="assets/nicoloading.png" alt="Loading" class="loading-spinner" />
 </div>
 <div *ngIf="!loading">
-<div class="container">
+  <div class="container">
   <mat-card class="card">
-    <div class="w-full flex">
+    <div class="w-full flex ">
       <img src="assets/logo.png" alt="Logo" class="flex w-full" />
     </div>
     <h1 class="title">CREA LISTA TRASFERTE 40+</h1>
+
+    <div *ngIf="error" class="error">{{ error }}</div>
 
     <button mat-raised-button color="primary" (click)="toggleForm()">
       <mat-icon>{{ showForm ? 'close' : (editMode ? 'edit' : 'add') }}</mat-icon>
@@ -63,6 +65,7 @@ import { MatDividerModule } from '@angular/material/divider';
       <mat-form-field class="field"><mat-label>Codice sicurezza</mat-label>
         <input matInput name="codiceSicurezza" [(ngModel)]="newUser.codiceSicurezza" />
       </mat-form-field>
+
       <button mat-raised-button color="primary" type="submit" [disabled]="!userForm.form.valid">
         {{ editMode ? 'Salva Modifiche' : 'Aggiungi Utente' }}
       </button>
@@ -72,17 +75,15 @@ import { MatDividerModule } from '@angular/material/divider';
 
     <mat-form-field appearance="fill" class="field">
       <mat-label>Cerca</mat-label>
-      <input matInput [(ngModel)]="searchTerm" placeholder="Cerca..." name="search" />
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="field">
-      <mat-label>Filtra per Trasferta</mat-label>
-      <input matInput [(ngModel)]="filterTrasferta" placeholder="Nome Trasferta" name="filterTrasferta" />
+      <input matInput [(ngModel)]="searchTerm" placeholder="Cerca..." />
     </mat-form-field>
 
     <div class="user-list-scroll">
       <div *ngFor="let user of filteredUsers(); trackBy: trackByUserId" class="user-item">
-        <mat-checkbox [checked]="isSelected(user.id)" (change)="onCheckboxChange($event.checked, user.id)"></mat-checkbox>
+        <mat-checkbox
+          [checked]="isSelected(user.id)"
+          (change)="onCheckboxChange($event.checked, user.id)">
+        </mat-checkbox>
 
         <div class="user-details">
           <div class="user-name">👤 {{ user.cognome }} {{ user.nome }}</div>
@@ -96,73 +97,124 @@ import { MatDividerModule } from '@angular/material/divider';
               <div><strong>🪪 Tessera:</strong> {{ user.numeroTessera }}</div>
               <div><strong>🔐 Sicurezza:</strong> {{ user.codiceSicurezza }}</div>
             </div>
-            <div class="user-row">
-              <strong>Trasferte:</strong>
-              <span *ngFor="let t of user.trasferte">{{ t }}&nbsp;</span>
-            </div>
           </div>
+        </div>
+
+        <div class="actions">
+          <button mat-icon-button color="accent" (click)="editUser(user)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteUser(user.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
         </div>
       </div>
     </div>
 
-    <button mat-raised-button color="accent" class="export-btn" (click)="exportLista()" [disabled]="!selected.length">
+    <button mat-raised-button color="accent" class="export-btn"
+            (click)="exportLista()" [disabled]="!selected.length">
       <mat-icon>download</mat-icon> Esporta Lista
     </button>
   </mat-card>
 </div>
 </div>
+
   `,
-    styles: [`
-    .loading-container { display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.9)); }
-    .loading-spinner { width: 100px; animation: spin 2s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  styles: [`
     .container { width: 100vw; margin: 0; padding: 0; }
     .card { padding: 24px; background-color: black !important; color: white; }
+    .logo-wrapper { text-align: center; }
+    .logo-img { max-width: 200px; width: 100%; height: auto; }
     .title { text-align: center; font-size: 24px; font-weight: bold; margin: 20px 0; }
+    .error { color: red; margin: 8px 0; }
     .field { display: block; margin-bottom: 12px; width: 100%; }
     .divider { margin: 16px 0; }
     .export-btn { margin-top: 12px; }
     .user-list-scroll { max-height: 400px; overflow-y: auto; padding-right: 8px; }
-    .user-item { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border-bottom: 1px solid #444; background-color: #121212; color: #eee; }
+    .user-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid #444;
+      background-color: #121212;
+      color: #eee;
+    }
     .user-details { flex: 1; display: flex; flex-direction: column; gap: 6px; }
     .user-name { font-weight: 600; font-size: 18px; color: #fff; }
     .user-meta { display: flex; flex-direction: column; gap: 4px; }
-    .user-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 14px; color: #ccc; }
+    .user-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 14px;
+      color: #ccc;
+    }
+    .loading-container { display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.9)); }
+    .loading-spinner { width: 100px; animation: spin 2s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   `]
 })
 export class ListaUtentiComponent implements OnInit {
   loading = true;
-  
   users: any[] = [];
   selected: string[] = [];
+  error = '';
   searchTerm = '';
-  filterTrasferta = '';
   showForm = false;
   editMode = false;
-  editingUserId: number | null = null;
   userIdCounter = 0;
+  editingUserId: number | null = null;
+
   newUser = {
     cognome: '', nome: '', dataNascita: '', luogoNascita: '',
-    codiceFiscale: '', numeroTessera: '', codiceSicurezza: '', trasferte: []
+    codiceFiscale: '', numeroTessera: '', codiceSicurezza: ''
   };
 
   ngOnInit(): void {
     this.loading = true;
     setTimeout(() => {
       this.loading = false;
-      this.initializeData();
     }, 3000);
-  }
 
-  initializeData() {
     const savedUsers = localStorage.getItem('utenti');
     const savedSelected = localStorage.getItem('utentiSelezionati');
+
     if (savedUsers) {
       this.users = JSON.parse(savedUsers);
       this.userIdCounter = this.users.reduce((max, u) => u.id > max ? u.id : max, 0) + 1;
     }
+
     if (savedSelected) {
       this.selected = JSON.parse(savedSelected);
+    }
+
+    if (!savedUsers) {
+      fetch('assets/utenti_precaricati.xlsx')
+        .then(res => res.arrayBuffer())
+        .then(arrayBuffer => {
+          const wb = XLSX.read(arrayBuffer, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const data = XLSX.utils.sheet_to_json(ws);
+
+          this.users = (data as any[]).map((row: any) => ({
+            id: this.userIdCounter++,
+            cognome: row['Cognome'] || '',
+            nome: row['Nome'] || '',
+            dataNascita: row['Data di nascita'] || '',
+            luogoNascita: row['Luogo di nascita'] || '',
+            codiceFiscale: row['Codice fiscale'] || '',
+            numeroTessera: row['Numero tessera'] || '',
+            codiceSicurezza: row['Codice sicurezza'] || ''
+          }));
+
+          this.saveToLocalStorage();
+        })
+        .catch(err => {
+          console.error('Errore nel caricamento Excel:', err);
+          this.error = 'Impossibile caricare il file utenti_precaricati.xlsx';
+        });
     }
   }
 
@@ -179,7 +231,7 @@ export class ListaUtentiComponent implements OnInit {
   resetForm() {
     this.newUser = {
       cognome: '', nome: '', dataNascita: '', luogoNascita: '',
-      codiceFiscale: '', numeroTessera: '', codiceSicurezza: '', trasferte: []
+      codiceFiscale: '', numeroTessera: '', codiceSicurezza: ''
     };
     this.editingUserId = null;
     this.editMode = false;
@@ -188,13 +240,22 @@ export class ListaUtentiComponent implements OnInit {
   addUser() {
     if (this.editMode && this.editingUserId !== null) {
       const index = this.users.findIndex(u => u.id === this.editingUserId);
-      if (index !== -1) this.users[index] = { id: this.editingUserId, ...this.newUser };
+      if (index !== -1) {
+        this.users[index] = { id: this.editingUserId, ...this.newUser };
+      }
     } else {
       this.users.push({ id: this.userIdCounter++, ...this.newUser });
     }
     this.saveToLocalStorage();
     this.resetForm();
     this.showForm = false;
+  }
+
+  editUser(user: any) {
+    this.newUser = { ...user };
+    this.editingUserId = user.id;
+    this.editMode = true;
+    this.showForm = true;
   }
 
   deleteUser(id: number) {
@@ -204,8 +265,11 @@ export class ListaUtentiComponent implements OnInit {
   }
 
   onCheckboxChange(checked: boolean, id: number) {
-    if (checked) this.selected.push(String(id));
-    else this.selected = this.selected.filter(s => s !== String(id));
+    if (checked) {
+      this.selected.push(String(id));
+    } else {
+      this.selected = this.selected.filter(s => s !== String(id));
+    }
     this.saveToLocalStorage();
   }
 
@@ -218,18 +282,25 @@ export class ListaUtentiComponent implements OnInit {
   }
 
   filteredUsers(): any[] {
+    if (!this.searchTerm.trim()) return this.users;
     const term = this.searchTerm.toLowerCase();
-    const filter = this.filterTrasferta.toLowerCase();
-    return this.users.filter(user => {
-      const matchesSearch = user.cognome?.toLowerCase().includes(term) || user.nome?.toLowerCase().includes(term) || user.codiceFiscale?.toLowerCase().includes(term);
-      const matchesTrasferta = !filter || user.trasferte?.some((t: string) => t.toLowerCase().includes(filter));
-      return matchesSearch && matchesTrasferta;
-    });
+    return this.users.filter(user =>
+      String(user.cognome || '').toLowerCase().includes(term) ||
+      String(user.nome || '').toLowerCase().includes(term) ||
+      String(user.codiceFiscale || '').toLowerCase().includes(term) ||
+      String(user.luogoNascita || '').toLowerCase().includes(term)
+    );
   }
+
+  
 
   exportLista() {
     const lista = this.users.filter(u => this.selected.includes(String(u.id)));
     const ws = XLSX.utils.json_to_sheet(lista);
+    ws['!cols'] = [
+      { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 20 },
+      { wch: 20 }, { wch: 15 }, { wch: 20 }
+    ];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'ListaTrasferta');
     XLSX.writeFile(wb, 'lista_trasferta.xlsx');
