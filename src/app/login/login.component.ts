@@ -144,7 +144,8 @@ export class LoginComponent {
   password = '';
   errorMsg = '';
   loading = false;
-  apiUrl = 'https://quarantapiu.vercel.app/api/login'; // Cambia con il tuo backend!
+  apiUrl = 'http://localhost:3000/api/login';
+  // Cambia con il tuo backend!
 
   constructor(private http: HttpClient, private router: Router) {}
 

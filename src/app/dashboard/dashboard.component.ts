@@ -9,13 +9,13 @@ import { ListaUtentiComponent } from "../lista-utenti/lista-utenti.component";
   standalone: true,
   imports: [CommonModule, MatButtonModule, ListaUtentiComponent],
   template: `
-    <div class="dashboard">
+    <!-- <div class="dashboard">
       <h2>Benvenuto nella Dashboard 🎉</h2>
       <p>Sei autenticato.</p>
       <button mat-raised-button color="warn" (click)="logout()">Logout</button>
-<!-- <app-lista-utenti></app-lista-utenti> -->
-
-    </div>
+      
+    </div> -->
+    <app-lista-utenti></app-lista-utenti>
   `,
   styles: [`
     .dashboard {
