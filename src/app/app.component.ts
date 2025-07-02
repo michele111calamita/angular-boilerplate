@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 @Component({
   standalone: true,
   selector: 'app-root',
-  imports:[ImportUtentiComponent, ListaUtentiComponent],
+  imports: [ImportUtentiComponent, ListaUtentiComponent, ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })

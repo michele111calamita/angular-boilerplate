@@ -25,99 +25,120 @@ import { MatDividerModule } from '@angular/material/divider';
     MatDividerModule
   ],
   template: `
-  <div *ngIf="loading" class="loading-container">
-  <img src="assets/nicoloading.png" alt="Loading" class="loading-spinner" />
-</div>
-<div *ngIf="!loading">
-  <div class="container">
-  <mat-card class="card">
-    <div class="w-full flex ">
-      <img src="assets/logo.png" alt="Logo" class="flex w-full" />
-    </div>
-    <h1 class="title">CREA LISTA TRASFERTE 40+</h1>
+ <div *ngIf="loading" class="loading-container">
+    <img src="assets/nicoloading.png" alt="Loading" class="loading-spinner" />
+  </div>
+  <div *ngIf="!loading">
+    <div class="container">
+      <mat-card class="card">
+        <div class="w-full flex ">
+          <img src="assets/logo.png" alt="Logo" class="flex w-full" />
+        </div>
+        <h1 class="title">CREA LISTA TRASFERTE 40+</h1>
 
-    <div *ngIf="error" class="error">{{ error }}</div>
+        <div *ngIf="error" class="error">{{ error }}</div>
+        <button mat-raised-button class="mb-3" color="primary" (click)="toggleForm()">
+          <mat-icon>{{ showForm ? 'close' : (editMode ? 'edit' : 'add') }}</mat-icon>
+          {{ showForm ? 'Chiudi Form' : (editMode ? 'Modifica Utente' : 'Aggiungi Utente') }}
+        </button>
 
-    <button mat-raised-button color="primary" (click)="toggleForm()">
-      <mat-icon>{{ showForm ? 'close' : (editMode ? 'edit' : 'add') }}</mat-icon>
-      {{ showForm ? 'Chiudi Form' : (editMode ? 'Modifica Utente' : 'Aggiungi Utente') }}
-    </button>
+        <form *ngIf="showForm" (ngSubmit)="addUser()" #userForm="ngForm">
+          <mat-form-field class="field"><mat-label>Cognome</mat-label>
+            <input matInput name="cognome" [(ngModel)]="newUser.cognome" required />
+          </mat-form-field>
+          <mat-form-field class="field"><mat-label>Nome</mat-label>
+            <input matInput name="nome" [(ngModel)]="newUser.nome" required />
+          </mat-form-field>
+          <mat-form-field class="field"><mat-label>Data di nascita</mat-label>
+            <input matInput name="dataNascita" [(ngModel)]="newUser.dataNascita" />
+          </mat-form-field>
+          <mat-form-field class="field"><mat-label>Luogo di nascita</mat-label>
+            <input matInput name="luogoNascita" [(ngModel)]="newUser.luogoNascita" />
+          </mat-form-field>
+          <mat-form-field class="field"><mat-label>Codice fiscale</mat-label>
+            <input matInput name="codiceFiscale" [(ngModel)]="newUser.codiceFiscale" required />
+          </mat-form-field>
+          <mat-form-field class="field"><mat-label>Numero tessera</mat-label>
+            <input matInput name="numeroTessera" [(ngModel)]="newUser.numeroTessera" />
+          </mat-form-field>
+          <mat-form-field class="field"><mat-label>Codice sicurezza</mat-label>
+            <input matInput name="codiceSicurezza" [(ngModel)]="newUser.codiceSicurezza" />
+          </mat-form-field>
 
-    <form *ngIf="showForm" (ngSubmit)="addUser()" #userForm="ngForm">
-      <mat-form-field class="field"><mat-label>Cognome</mat-label>
-        <input matInput name="cognome" [(ngModel)]="newUser.cognome" required />
-      </mat-form-field>
-      <mat-form-field class="field"><mat-label>Nome</mat-label>
-        <input matInput name="nome" [(ngModel)]="newUser.nome" required />
-      </mat-form-field>
-      <mat-form-field class="field"><mat-label>Data di nascita</mat-label>
-        <input matInput name="dataNascita" [(ngModel)]="newUser.dataNascita" />
-      </mat-form-field>
-      <mat-form-field class="field"><mat-label>Luogo di nascita</mat-label>
-        <input matInput name="luogoNascita" [(ngModel)]="newUser.luogoNascita" />
-      </mat-form-field>
-      <mat-form-field class="field"><mat-label>Codice fiscale</mat-label>
-        <input matInput name="codiceFiscale" [(ngModel)]="newUser.codiceFiscale" required />
-      </mat-form-field>
-      <mat-form-field class="field"><mat-label>Numero tessera</mat-label>
-        <input matInput name="numeroTessera" [(ngModel)]="newUser.numeroTessera" />
-      </mat-form-field>
-      <mat-form-field class="field"><mat-label>Codice sicurezza</mat-label>
-        <input matInput name="codiceSicurezza" [(ngModel)]="newUser.codiceSicurezza" />
-      </mat-form-field>
+          <button mat-raised-button color="primary" type="submit" [disabled]="!userForm.form.valid">
+            {{ editMode ? 'Salva Modifiche' : 'Aggiungi Utente' }}
+          </button>
+        </form>
 
-      <button mat-raised-button color="primary" type="submit" [disabled]="!userForm.form.valid">
-        {{ editMode ? 'Salva Modifiche' : 'Aggiungi Utente' }}
-      </button>
-    </form>
+        <button mat-raised-button color="accent" (click)="toggleTrasfertaForm()">
+          <mat-icon>{{ showTrasfertaForm ? 'close' : 'add' }}</mat-icon>
+          {{ showTrasfertaForm ? 'Chiudi Trasferta' : 'Nuova Trasferta' }}
+        </button>
+  
+        <div *ngIf="showTrasfertaForm">
+          <mat-form-field class="field">
+            <mat-label>Nuova Trasferta</mat-label>
+            <input matInput [(ngModel)]="newTrasfertaName" placeholder="Nome Trasferta" />
+          </mat-form-field>
+          <button mat-raised-button class="w-full" color="accent" (click)="addTrasferta()" [disabled]="!newTrasfertaName.trim()">
+            <mat-icon>add</mat-icon> Aggiungi Trasferta
+          </button>
+        </div>
 
-    <mat-divider class="divider"></mat-divider>
+        <mat-form-field class="field my-3">
+          <mat-label>Trasferta Attiva</mat-label>
+          <select matNativeControl [(ngModel)]="activeTrasferta">
+            <option *ngFor="let t of trasferte" [value]="t">{{ t }}</option>
+          </select>
+        </mat-form-field>
 
-    <mat-form-field appearance="fill" class="field">
-      <mat-label>Cerca</mat-label>
-      <input matInput [(ngModel)]="searchTerm" placeholder="Cerca..." />
-    </mat-form-field>
+     
 
-    <div class="user-list-scroll">
-      <div *ngFor="let user of filteredUsers(); trackBy: trackByUserId" class="user-item">
-        <mat-checkbox
-          [checked]="isSelected(user.id)"
-          (change)="onCheckboxChange($event.checked, user.id)">
-        </mat-checkbox>
+        <mat-form-field appearance="fill" class="field">
+          <mat-label>Cerca</mat-label>
+          <input matInput [(ngModel)]="searchTerm" placeholder="Cerca..." />
+        </mat-form-field>
 
-        <div class="user-details">
-          <div class="user-name">👤 {{ user.cognome }} {{ user.nome }}</div>
-          <div class="user-meta">
-            <div class="user-row">
-              <div><strong>📇 CF:</strong> {{ user.codiceFiscale }}</div>
-              <div><strong>🎂 Nascita:</strong> {{ user.dataNascita }}</div>
-              <div><strong>📍 Luogo:</strong> {{ user.luogoNascita }}</div>
+        <div class="user-list-scroll">
+          <div *ngFor="let user of filteredUsers(); trackBy: trackByUserId" class="user-item">
+            <mat-checkbox
+              [checked]="isUserInTrasferta(user.id)"
+              (change)="toggleUserInTrasferta($event.checked, user.id)">
+            </mat-checkbox>
+
+            <div class="user-details">
+              <div class="user-name">👤 {{ user.cognome }} {{ user.nome }}</div>
+              <div class="user-meta">
+                <div class="user-row">
+                  <div><strong>📇 CF:</strong> {{ user.codiceFiscale }}</div>
+                  <div><strong>🎂 Nascita:</strong> {{ user.dataNascita }}</div>
+                  <div><strong>📍 Luogo:</strong> {{ user.luogoNascita }}</div>
+                </div>
+                <div class="user-row">
+                  <div><strong>🪪 Tessera:</strong> {{ user.numeroTessera }}</div>
+                  <div><strong>🔐 Sicurezza:</strong> {{ user.codiceSicurezza }}</div>
+                </div>
+              </div>
             </div>
-            <div class="user-row">
-              <div><strong>🪪 Tessera:</strong> {{ user.numeroTessera }}</div>
-              <div><strong>🔐 Sicurezza:</strong> {{ user.codiceSicurezza }}</div>
+
+            <div class="actions">
+              <button mat-icon-button color="accent" (click)="editUser(user)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteUser(user.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="actions">
-          <button mat-icon-button color="accent" (click)="editUser(user)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteUser(user.id)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
+        <button mat-raised-button color="accent" class="export-btn"
+                (click)="exportLista()" [disabled]="!activeTrasferta">
+          <mat-icon>download</mat-icon> Esporta Lista
+        </button>
+      </mat-card>
     </div>
-
-    <button mat-raised-button color="accent" class="export-btn"
-            (click)="exportLista()" [disabled]="!selected.length">
-      <mat-icon>download</mat-icon> Esporta Lista
-    </button>
-  </mat-card>
-</div>
-</div>
+  </div>
 
   `,
   styles: [`
@@ -166,6 +187,12 @@ export class ListaUtentiComponent implements OnInit {
   editMode = false;
   userIdCounter = 0;
   editingUserId: number | null = null;
+  showTrasfertaForm = false;
+
+  trasferte: string[] = [];
+  trasferteUtenti: Record<string, string[]> = {};
+  activeTrasferta: string = '';
+  newTrasfertaName = '';
 
   newUser = {
     cognome: '', nome: '', dataNascita: '', luogoNascita: '',
@@ -180,6 +207,8 @@ export class ListaUtentiComponent implements OnInit {
 
     const savedUsers = localStorage.getItem('utenti');
     const savedSelected = localStorage.getItem('utentiSelezionati');
+    const storedTrasferte = localStorage.getItem('trasferte');
+    const storedMap = localStorage.getItem('trasferteUtenti');
 
     if (savedUsers) {
       this.users = JSON.parse(savedUsers);
@@ -189,6 +218,9 @@ export class ListaUtentiComponent implements OnInit {
     if (savedSelected) {
       this.selected = JSON.parse(savedSelected);
     }
+
+    if (storedTrasferte) this.trasferte = JSON.parse(storedTrasferte);
+    if (storedMap) this.trasferteUtenti = JSON.parse(storedMap);
 
     if (!savedUsers) {
       fetch('assets/utenti_precaricati.xlsx')
@@ -218,9 +250,36 @@ export class ListaUtentiComponent implements OnInit {
     }
   }
 
+  addTrasferta() {
+    if (this.newTrasfertaName.trim() && !this.trasferte.includes(this.newTrasfertaName)) {
+      this.trasferte.push(this.newTrasfertaName);
+      this.trasferteUtenti[this.newTrasfertaName] = [];
+      this.activeTrasferta = this.newTrasfertaName;
+      this.newTrasfertaName = '';
+      this.saveToLocalStorage();
+    }
+  }
+
+  toggleUserInTrasferta(checked: boolean, userId: number) {
+    if (!this.activeTrasferta) return;
+    const list = this.trasferteUtenti[this.activeTrasferta] || [];
+    if (checked) {
+      if (!list.includes(String(userId))) list.push(String(userId));
+    } else {
+      this.trasferteUtenti[this.activeTrasferta] = list.filter(id => id !== String(userId));
+    }
+    this.saveToLocalStorage();
+  }
+
+  isUserInTrasferta(userId: number): boolean | string {
+    return this.activeTrasferta && this.trasferteUtenti[this.activeTrasferta]?.includes(String(userId));
+  }
+
   saveToLocalStorage() {
     localStorage.setItem('utenti', JSON.stringify(this.users));
     localStorage.setItem('utentiSelezionati', JSON.stringify(this.selected));
+    localStorage.setItem('trasferte', JSON.stringify(this.trasferte));
+    localStorage.setItem('trasferteUtenti', JSON.stringify(this.trasferteUtenti));
   }
 
   toggleForm() {
@@ -304,5 +363,11 @@ export class ListaUtentiComponent implements OnInit {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'ListaTrasferta');
     XLSX.writeFile(wb, 'lista_trasferta.xlsx');
+  }
+  toggleTrasfertaForm() {
+    this.showTrasfertaForm = !this.showTrasfertaForm;
+    if (!this.showTrasfertaForm) {
+      this.newTrasfertaName = '';
+    }
   }
 }
