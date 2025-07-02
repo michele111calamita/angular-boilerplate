@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 // import { AppComponent } from './app.component';
 // import { ImportUtentiComponent } from './import-utenti/import-utenti.component';
@@ -19,6 +20,8 @@ import { MatListModule } from '@angular/material/list';
     // AppComponent,
     // ImportUtentiComponent,
     // ListaUtentiComponent
+  
+    // DashboardComponent
   ],
   imports: [
     BrowserModule,
