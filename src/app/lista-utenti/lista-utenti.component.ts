@@ -9,6 +9,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-lista-utenti',
@@ -22,7 +23,8 @@ import { MatDividerModule } from '@angular/material/divider';
     MatCheckboxModule,
     MatButtonModule,
     MatIconModule,
-    MatDividerModule
+    MatDividerModule,
+    HttpClientModule // <
   ],
   template: `
  <div *ngIf="loading" class="loading-container">
@@ -198,6 +200,7 @@ export class ListaUtentiComponent implements OnInit {
     cognome: '', nome: '', dataNascita: '', luogoNascita: '',
     codiceFiscale: '', numeroTessera: '', codiceSicurezza: ''
   };
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
     this.loading = true;
@@ -205,49 +208,70 @@ export class ListaUtentiComponent implements OnInit {
       this.loading = false;
     }, 3000);
 
-    const savedUsers = localStorage.getItem('utenti');
-    const savedSelected = localStorage.getItem('utentiSelezionati');
-    const storedTrasferte = localStorage.getItem('trasferte');
-    const storedMap = localStorage.getItem('trasferteUtenti');
+    // const savedUsers = localStorage.getItem('utenti');
+    // const savedSelected = localStorage.getItem('utentiSelezionati');
+    // const storedTrasferte = localStorage.getItem('trasferte');
+    // const storedMap = localStorage.getItem('trasferteUtenti');
 
-    if (savedUsers) {
-      this.users = JSON.parse(savedUsers);
-      this.userIdCounter = this.users.reduce((max, u) => u.id > max ? u.id : max, 0) + 1;
-    }
+    // if (savedUsers) {
+    //   this.users = JSON.parse(savedUsers);
+    //   this.userIdCounter = this.users.reduce((max, u) => u.id > max ? u.id : max, 0) + 1;
+    // }
 
-    if (savedSelected) {
-      this.selected = JSON.parse(savedSelected);
-    }
+    // if (savedSelected) {
+    //   this.selected = JSON.parse(savedSelected);
+    // }
 
-    if (storedTrasferte) this.trasferte = JSON.parse(storedTrasferte);
-    if (storedMap) this.trasferteUtenti = JSON.parse(storedMap);
+    // if (storedTrasferte) this.trasferte = JSON.parse(storedTrasferte);
+    // if (storedMap) this.trasferteUtenti = JSON.parse(storedMap);
 
-    if (!savedUsers) {
-      fetch('assets/utenti_precaricati.xlsx')
-        .then(res => res.arrayBuffer())
-        .then(arrayBuffer => {
-          const wb = XLSX.read(arrayBuffer, { type: 'array' });
-          const ws = wb.Sheets[wb.SheetNames[0]];
-          const data = XLSX.utils.sheet_to_json(ws);
+    // if (!savedUsers) {
+    //   fetch('assets/utenti_precaricati.xlsx')
+    //     .then(res => res.arrayBuffer())
+    //     .then(arrayBuffer => {
+    //       const wb = XLSX.read(arrayBuffer, { type: 'array' });
+    //       const ws = wb.Sheets[wb.SheetNames[0]];
+    //       const data = XLSX.utils.sheet_to_json(ws);
 
-          this.users = (data as any[]).map((row: any) => ({
-            id: this.userIdCounter++,
-            cognome: row['Cognome'] || '',
-            nome: row['Nome'] || '',
-            dataNascita: row['Data di nascita'] || '',
-            luogoNascita: row['Luogo di nascita'] || '',
-            codiceFiscale: row['Codice fiscale'] || '',
-            numeroTessera: row['Numero tessera'] || '',
-            codiceSicurezza: row['Codice sicurezza'] || ''
-          }));
+    //       this.users = (data as any[]).map((row: any) => ({
+    //         id: this.userIdCounter++,
+    //         cognome: row['Cognome'] || '',
+    //         nome: row['Nome'] || '',
+    //         dataNascita: row['Data di nascita'] || '',
+    //         luogoNascita: row['Luogo di nascita'] || '',
+    //         codiceFiscale: row['Codice fiscale'] || '',
+    //         numeroTessera: row['Numero tessera'] || '',
+    //         codiceSicurezza: row['Codice sicurezza'] || ''
+    //       }));
 
-          this.saveToLocalStorage();
-        })
-        .catch(err => {
-          console.error('Errore nel caricamento Excel:', err);
-          this.error = 'Impossibile caricare il file utenti_precaricati.xlsx';
-        });
-    }
+    //       this.saveToLocalStorage();
+    //     })
+    //     .catch(err => {
+    //       console.error('Errore nel caricamento Excel:', err);
+    //       this.error = 'Impossibile caricare il file utenti_precaricati.xlsx';
+    //     });
+    // }
+    this.http.get<any[]>('http://localhost:3000/api/users').subscribe({
+      next: (data) => {
+        this.users = data.map((user, index) => ({
+          id: user.id || index,
+          cognome: user.cognome || '',
+          nome: user.nome || '',
+          dataNascita: user.dataNascita || '',
+          luogoNascita: user.luogoNascita || '',
+          codiceFiscale: user.codiceFiscale || '',
+          numeroTessera: user.numeroTessera || '',
+          codiceSicurezza: user.codiceSicurezza || ''
+        }));
+        this.userIdCounter = this.users.reduce((max, u) => (u.id > max ? u.id : max), 0) + 1;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Errore nel caricamento utenti dal server';
+        this.loading = false;
+        console.error(err);
+      }
+    });
   }
 
   addTrasferta() {
