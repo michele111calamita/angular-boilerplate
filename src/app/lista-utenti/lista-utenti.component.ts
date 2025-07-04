@@ -251,7 +251,7 @@ export class ListaUtentiComponent implements OnInit {
     //       this.error = 'Impossibile caricare il file utenti_precaricati.xlsx';
     //     });
     // }
-    this.http.get<any[]>('http://quarantapiu-be.vercel.app/api/users').subscribe({
+    this.http.get<any[]>('https://quarantapiu-be.vercel.app/api/users').subscribe({
       next: (data) => {
         this.users = data.map((user, index) => ({
           id: user.id || index,
