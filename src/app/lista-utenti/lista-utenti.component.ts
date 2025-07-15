@@ -218,16 +218,15 @@ export class ListaUtentiComponent implements OnInit {
     
     // Carica utenti dall'API
     this.userService.getUsers().subscribe({
-      next: (data) => {
-        this.users = data.map((user, index) => ({
+      next: (data) => {        this.users = data.map((user, index) => ({
           id: user.id || index,
           cognome: user.cognome || '',
           nome: user.nome || '',
           dataNascita: user.dataNascita || '',
-          luogoNascita: '',
+          luogoNascita: user.luogoNascita || '',
           codiceFiscale: user.codiceFiscale || '',
-          numeroTessera: '',
-          codiceSicurezza: ''
+          numeroTessera: user.numeroTessera || '',
+          codiceSicurezza: user.codiceSicurezza || ''
         }));
         this.userIdCounter = this.users.reduce((max, u) => (u.id > max ? u.id : max), 0) + 1;
         this.loading = false;
