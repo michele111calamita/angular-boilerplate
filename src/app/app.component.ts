@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+// Update the import path to the correct location of AuthService
+import { AuthService } from './services/auth.service';
+import { Router, RouterOutlet } from '@angular/router';
 import { ImportUtentiComponent } from './import-utenti/import-utenti.component';
 import { ListaUtentiComponent } from './lista-utenti/lista-utenti.component';
-import { Router, RouterOutlet } from '@angular/router';
 import { DashboardComponent } from "./dashboard/dashboard.component";
 
 @Component({
@@ -11,15 +13,20 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'angular-test';
-  constructor(private router: Router) {}
+  isLoggedIn = false;
+
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit() {
-    const isAuth = localStorage.getItem('auth') === 'true';
-    if (!isAuth) {
-      this.router.navigate(['/login']);
-    }
+    this.authService.isLoggedIn$.subscribe(loggedIn => {
+      this.isLoggedIn = loggedIn;
+    });
   }
-  
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }
