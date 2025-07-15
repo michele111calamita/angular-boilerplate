@@ -201,23 +201,9 @@ export class ListaUtentiComponent implements OnInit {
     cognome: '', nome: '', dataNascita: '', luogoNascita: '',
     codiceFiscale: '', numeroTessera: '', codiceSicurezza: ''
   };
-  constructor(private http: HttpClient, private userService: UserService) {}
-  ngOnInit(): void {
+  constructor(private http: HttpClient, private userService: UserService) {}  ngOnInit(): void {
     this.loading = true;
     
-    // Carica utenti dall'API
-    this.userService.getUsers().subscribe({
-      next: (users) => {
-        this.users = users;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Errore nel caricamento utenti:', error);
-        this.error = 'Errore nel caricamento utenti';
-        this.loading = false;
-      }
-    });
-
     // Carica dati localStorage esistenti
     const savedSelected = localStorage.getItem('utentiSelezionati');
     const storedTrasferte = localStorage.getItem('trasferte');
@@ -229,9 +215,8 @@ export class ListaUtentiComponent implements OnInit {
 
     if (storedTrasferte) this.trasferte = JSON.parse(storedTrasferte);
     if (storedMap) this.trasferteUtenti = JSON.parse(storedMap);
-    //       this.error = 'Impossibile caricare il file utenti_precaricati.xlsx';
-    //     });
-    // }
+    
+    // Carica utenti dall'API
     this.userService.getUsers().subscribe({
       next: (data) => {
         this.users = data.map((user, index) => ({
