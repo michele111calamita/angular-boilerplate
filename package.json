@@ -1,9 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "build": "echo 'Skipping build'",
+    "start": "echo 'Skipping start'",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
