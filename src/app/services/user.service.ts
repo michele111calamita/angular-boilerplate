@@ -15,7 +15,7 @@ export interface User {
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private apiUrl = 'http://localhost:3001/api/users'; // Server locale
+  private apiUrl = 'https://quarantapiu-be.vercel.app/api/users'; // Server produzione
 
   constructor(private http: HttpClient) {}
 
