@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { UserService, User } from '../services/user.service';
 
 @Component({
   selector: 'app-lista-utenti',
@@ -200,7 +201,7 @@ export class ListaUtentiComponent implements OnInit {
     cognome: '', nome: '', dataNascita: '', luogoNascita: '',
     codiceFiscale: '', numeroTessera: '', codiceSicurezza: ''
   };
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private userService: UserService) {}
 
   ngOnInit(): void {
     this.loading = true;
@@ -251,17 +252,17 @@ export class ListaUtentiComponent implements OnInit {
     //       this.error = 'Impossibile caricare il file utenti_precaricati.xlsx';
     //     });
     // }
-    this.http.get<any[]>('https://quarantapiu-be.vercel.app/api/users').subscribe({
+    this.userService.getUsers().subscribe({
       next: (data) => {
         this.users = data.map((user, index) => ({
           id: user.id || index,
           cognome: user.cognome || '',
           nome: user.nome || '',
-          dataNascita: user.dataNascita || '',
-          luogoNascita: user.luogoNascita || '',
-          codiceFiscale: user.codiceFiscale || '',
-          numeroTessera: user.numeroTessera || '',
-          codiceSicurezza: user.codiceSicurezza || ''
+          dataNascita: user.data_nascita || '',
+          luogoNascita: '',
+          codiceFiscale: user.codice_fiscale || '',
+          numeroTessera: '',
+          codiceSicurezza: ''
         }));
         this.userIdCounter = this.users.reduce((max, u) => (u.id > max ? u.id : max), 0) + 1;
         this.loading = false;

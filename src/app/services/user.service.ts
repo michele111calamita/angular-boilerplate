@@ -19,7 +19,7 @@ export interface User {
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private apiUrl = 'http://localhost:3002/api/users'; // Server locale
+  private apiUrl = 'http://localhost:3003/api/users'; // Server locale
 
   constructor(private http: HttpClient) {}
 
