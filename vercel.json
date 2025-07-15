@@ -1,31 +1,48 @@
 {
-  "name": "quarantapiu-angular",
   "buildCommand": "ng build --configuration production",
   "outputDirectory": "dist/angular-test",
   "devCommand": "ng serve",
   "framework": "angular",
   "installCommand": "npm install",
-  "headers": [
-    {
-      "source": "/(.*)\\.js$",
-      "headers": [
-        { "key": "Content-Type", "value": "application/javascript" }
-      ]
-    },
-    {
-      "source": "/(.*)\\.css$",
-      "headers": [
-        { "key": "Content-Type", "value": "text/css" }
-      ]
-    },
-    {
-      "source": "/(.*)\\.html$",
-      "headers": [
-        { "key": "Content-Type", "value": "text/html" }
-      ]
-    }
-  ],
   "routes": [
+    {
+      "src": "/runtime(.*)\\.js$",
+      "headers": { 
+        "content-type": "application/javascript",
+        "cache-control": "public, max-age=31536000"
+      },
+      "continue": true
+    },
+    {
+      "src": "/polyfills(.*)\\.js$",
+      "headers": { 
+        "content-type": "application/javascript",
+        "cache-control": "public, max-age=31536000"
+      },
+      "continue": true
+    },
+    {
+      "src": "/main(.*)\\.js$",
+      "headers": { 
+        "content-type": "application/javascript",
+        "cache-control": "public, max-age=31536000"
+      },
+      "continue": true
+    },
+    {
+      "src": "/.*\\.js$",
+      "headers": { 
+        "content-type": "application/javascript" 
+      },
+      "continue": true
+    },
+    {
+      "src": "/.*\\.css$",
+      "headers": { 
+        "content-type": "text/css" 
+      },
+      "continue": true
+    },
     { 
       "handle": "filesystem"
     },
