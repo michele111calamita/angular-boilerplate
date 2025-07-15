@@ -3,19 +3,23 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface User {
-  id: string;
-  cognome: string;
+  id: number;
   nome: string;
-  dataNascita: string;
-  luogoNascita: string;
-  codiceFiscale: string;
-  numeroTessera: string;
-  codiceSicurezza: string;
+  cognome: string;
+  email: string;
+  data_nascita: string;
+  telefono: string;
+  indirizzo: string;
+  citta: string;
+  cap: string;
+  provincia: string;
+  codice_fiscale: string;
+  note: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private apiUrl = 'https://quarantapiu-be.vercel.app/api/users'; // Server produzione
+  private apiUrl = 'http://localhost:3002/api/users'; // Server locale
 
   constructor(private http: HttpClient) {}
 

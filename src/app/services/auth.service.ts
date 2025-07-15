@@ -4,7 +4,7 @@ import { tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private baseUrl = 'https://quarantapiu-be.vercel.app'; // Server produzione
+  private baseUrl = 'http://localhost:3002'; // Server locale
 
   constructor(private http: HttpClient) {}
 
