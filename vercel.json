@@ -5,16 +5,29 @@
   "devCommand": "ng serve",
   "framework": "angular",
   "installCommand": "npm install",
+  "headers": [
+    {
+      "source": "/(.*)\\.js$",
+      "headers": [
+        { "key": "Content-Type", "value": "application/javascript" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.css$",
+      "headers": [
+        { "key": "Content-Type", "value": "text/css" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.html$",
+      "headers": [
+        { "key": "Content-Type", "value": "text/html" }
+      ]
+    }
+  ],
   "routes": [
     { 
-      "src": "^/(?:runtime|polyfills|main|scripts|vendor)(-es(5|2015))?\\.[0-9a-f]{16}\\.(js|js\\.map)$",
-      "headers": { "content-type": "application/javascript" },
-      "continue": true
-    },
-    { 
-      "src": "^/styles\\.[0-9a-f]{16}\\.(css|css\\.map)$",
-      "headers": { "content-type": "text/css" },
-      "continue": true
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
