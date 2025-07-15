@@ -202,53 +202,33 @@ export class ListaUtentiComponent implements OnInit {
     codiceFiscale: '', numeroTessera: '', codiceSicurezza: ''
   };
   constructor(private http: HttpClient, private userService: UserService) {}
-
   ngOnInit(): void {
     this.loading = true;
-    setTimeout(() => {
-      this.loading = false;
-    }, 3000);
+    
+    // Carica utenti dall'API
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        this.users = users;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Errore nel caricamento utenti:', error);
+        this.error = 'Errore nel caricamento utenti';
+        this.loading = false;
+      }
+    });
 
-    // const savedUsers = localStorage.getItem('utenti');
-    // const savedSelected = localStorage.getItem('utentiSelezionati');
-    // const storedTrasferte = localStorage.getItem('trasferte');
-    // const storedMap = localStorage.getItem('trasferteUtenti');
+    // Carica dati localStorage esistenti
+    const savedSelected = localStorage.getItem('utentiSelezionati');
+    const storedTrasferte = localStorage.getItem('trasferte');
+    const storedMap = localStorage.getItem('trasferteUtenti');
 
-    // if (savedUsers) {
-    //   this.users = JSON.parse(savedUsers);
-    //   this.userIdCounter = this.users.reduce((max, u) => u.id > max ? u.id : max, 0) + 1;
-    // }
+    if (savedSelected) {
+      this.selected = JSON.parse(savedSelected);
+    }
 
-    // if (savedSelected) {
-    //   this.selected = JSON.parse(savedSelected);
-    // }
-
-    // if (storedTrasferte) this.trasferte = JSON.parse(storedTrasferte);
-    // if (storedMap) this.trasferteUtenti = JSON.parse(storedMap);
-
-    // if (!savedUsers) {
-    //   fetch('assets/utenti_precaricati.xlsx')
-    //     .then(res => res.arrayBuffer())
-    //     .then(arrayBuffer => {
-    //       const wb = XLSX.read(arrayBuffer, { type: 'array' });
-    //       const ws = wb.Sheets[wb.SheetNames[0]];
-    //       const data = XLSX.utils.sheet_to_json(ws);
-
-    //       this.users = (data as any[]).map((row: any) => ({
-    //         id: this.userIdCounter++,
-    //         cognome: row['Cognome'] || '',
-    //         nome: row['Nome'] || '',
-    //         dataNascita: row['Data di nascita'] || '',
-    //         luogoNascita: row['Luogo di nascita'] || '',
-    //         codiceFiscale: row['Codice fiscale'] || '',
-    //         numeroTessera: row['Numero tessera'] || '',
-    //         codiceSicurezza: row['Codice sicurezza'] || ''
-    //       }));
-
-    //       this.saveToLocalStorage();
-    //     })
-    //     .catch(err => {
-    //       console.error('Errore nel caricamento Excel:', err);
+    if (storedTrasferte) this.trasferte = JSON.parse(storedTrasferte);
+    if (storedMap) this.trasferteUtenti = JSON.parse(storedMap);
     //       this.error = 'Impossibile caricare il file utenti_precaricati.xlsx';
     //     });
     // }
@@ -258,9 +238,9 @@ export class ListaUtentiComponent implements OnInit {
           id: user.id || index,
           cognome: user.cognome || '',
           nome: user.nome || '',
-          dataNascita: user.data_nascita || '',
+          dataNascita: user.dataNascita || '',
           luogoNascita: '',
-          codiceFiscale: user.codice_fiscale || '',
+          codiceFiscale: user.codiceFiscale || '',
           numeroTessera: '',
           codiceSicurezza: ''
         }));

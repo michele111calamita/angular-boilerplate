@@ -1,0 +1,14 @@
+{
+  "name": "quarantapiu-angular",
+  "buildCommand": "ng build --configuration production",
+  "outputDirectory": "dist/angular-test",
+  "devCommand": "ng serve",
+  "framework": "angular",
+  "installCommand": "npm install",
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
