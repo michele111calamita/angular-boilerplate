@@ -6,6 +6,16 @@
   "framework": "angular",
   "installCommand": "npm install",
   "routes": [
+    { 
+      "src": "^/(?:runtime|polyfills|main|scripts|vendor)(-es(5|2015))?\\.[0-9a-f]{16}\\.(js|js\\.map)$",
+      "headers": { "content-type": "application/javascript" },
+      "continue": true
+    },
+    { 
+      "src": "^/styles\\.[0-9a-f]{16}\\.(css|css\\.map)$",
+      "headers": { "content-type": "text/css" },
+      "continue": true
+    },
     {
       "src": "/(.*)",
       "dest": "/index.html"
