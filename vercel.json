@@ -4,51 +4,42 @@
   "devCommand": "ng serve",
   "framework": "angular",
   "installCommand": "npm install",
-  "routes": [
+  "headers": [
     {
-      "src": "/runtime(.*)\\.js$",
-      "headers": { 
-        "content-type": "application/javascript",
-        "cache-control": "public, max-age=31536000"
-      },
-      "continue": true
+      "source": "/runtime(.*)\\.js$",
+      "headers": [
+        { "key": "Content-Type", "value": "application/javascript" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000" }
+      ]
     },
     {
-      "src": "/polyfills(.*)\\.js$",
-      "headers": { 
-        "content-type": "application/javascript",
-        "cache-control": "public, max-age=31536000"
-      },
-      "continue": true
+      "source": "/polyfills(.*)\\.js$",
+      "headers": [
+        { "key": "Content-Type", "value": "application/javascript" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000" }
+      ]
     },
     {
-      "src": "/main(.*)\\.js$",
-      "headers": { 
-        "content-type": "application/javascript",
-        "cache-control": "public, max-age=31536000"
-      },
-      "continue": true
+      "source": "/main(.*)\\.js$",
+      "headers": [
+        { "key": "Content-Type", "value": "application/javascript" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000" }
+      ]
     },
     {
-      "src": "/.*\\.js$",
-      "headers": { 
-        "content-type": "application/javascript" 
-      },
-      "continue": true
+      "source": "/(.*)\\.js$",
+      "headers": [
+        { "key": "Content-Type", "value": "application/javascript" }
+      ]
     },
     {
-      "src": "/.*\\.css$",
-      "headers": { 
-        "content-type": "text/css" 
-      },
-      "continue": true
-    },
-    { 
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)\\.css$",
+      "headers": [
+        { "key": "Content-Type", "value": "text/css" }
+      ]
     }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
