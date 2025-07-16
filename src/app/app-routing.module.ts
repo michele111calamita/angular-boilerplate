@@ -3,6 +3,7 @@ import { provideRouter, Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { UserManagerComponent } from './user-manager/user-manager.component';
 
 
 const routes: Routes = [
@@ -15,8 +16,12 @@ const routes: Routes = [
     loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
   },
   {
+    path: 'user-manager',
+    loadComponent: () => import('./user-manager/user-manager.component').then(m => m.UserManagerComponent)
+  },
+  {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'user-manager',
     pathMatch: 'full'
   }
 ];

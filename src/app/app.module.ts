@@ -14,12 +14,14 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 // import { AppComponent } from './app.component';
 // import { ImportUtentiComponent } from './import-utenti/import-utenti.component';
 // import { ListaUtentiComponent } from './lista-utenti/lista-utenti.component';
+// import { UserManagerComponent } from './user-manager/user-manager.component';
 
 @NgModule({
   declarations: [
     // AppComponent,
     // ImportUtentiComponent,
-    // ListaUtentiComponent
+    // ListaUtentiComponent,
+    // UserManagerComponent
   
     // DashboardComponent
   ],

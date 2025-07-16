@@ -2,20 +2,14 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
-import { ListaUtentiComponent } from "../lista-utenti/lista-utenti.component";
+import { UserManagerComponent } from '../user-manager/user-manager.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, ListaUtentiComponent],
+  imports: [CommonModule, MatButtonModule, UserManagerComponent],
   template: `
-    <!-- <div class="dashboard">
-      <h2>Benvenuto nella Dashboard 🎉</h2>
-      <p>Sei autenticato.</p>
-      <button mat-raised-button color="warn" (click)="logout()">Logout</button>
-      
-    </div> -->
-    <app-lista-utenti></app-lista-utenti>
+    <app-user-manager></app-user-manager>
   `,
   styles: [`
     .dashboard {

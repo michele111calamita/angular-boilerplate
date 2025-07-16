@@ -3,13 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from './services/auth.service';
 import { Router, RouterOutlet } from '@angular/router';
 import { ImportUtentiComponent } from './import-utenti/import-utenti.component';
-import { ListaUtentiComponent } from './lista-utenti/lista-utenti.component';
+import { UserManagerComponent } from './user-manager/user-manager.component';
 import { DashboardComponent } from "./dashboard/dashboard.component";
 
 @Component({
   standalone: true,
   selector: 'app-root',
-  imports: [ImportUtentiComponent, ListaUtentiComponent, DashboardComponent,RouterOutlet],
+  imports: [ImportUtentiComponent, UserManagerComponent, DashboardComponent, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })

@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface User {
-  id: string;
+  id: number; // Changed from string to number
   nome: string;
   cognome: string;
   dataNascita: string;
