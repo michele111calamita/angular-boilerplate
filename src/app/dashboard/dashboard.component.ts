@@ -9,7 +9,7 @@ import { UserManagerComponent } from '../user-manager/user-manager.component';
   standalone: true,
   imports: [CommonModule, MatButtonModule, UserManagerComponent],
   template: `
-    <app-user-manager></app-user-manager>
+    <app-lista-utenti></app-lista-utenti>
   `,
   styles: [`
     .dashboard {
