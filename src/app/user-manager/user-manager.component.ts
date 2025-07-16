@@ -526,16 +526,21 @@ export class UserManagerComponent implements OnInit {
 
   deleteUser(id: number): void {
     if (confirm('Sei sicuro di voler eliminare questo utente?')) {
-      this.users = this.users.filter(u => Number(u.id) !== id);
-      
-      // Rimuovi l'utente da tutte le trasferte
-      for (const trasfertaName in this.trasferteUtenti) {
-        this.trasferteUtenti[trasfertaName] = this.trasferteUtenti[trasfertaName].filter(userId => userId !== String(id));
-      }
-      
-      this.saveToLocalStorage();
-      this.applySearchFilter();
-      this.showNotification('Utente eliminato', 'success');
+      this.userService.deleteUser(id).subscribe({
+        next: () => {
+          this.users = this.users.filter(u => u.id !== id);
+          for (const trasfertaName in this.trasferteUtenti) {
+            this.trasferteUtenti[trasfertaName] = this.trasferteUtenti[trasfertaName].filter(userId => userId !== id.toString());
+          }
+          this.saveToLocalStorage();
+          this.applySearchFilter();
+          this.showNotification('Utente eliminato con successo', 'success');
+        },
+        error: (err) => {
+          console.error('Errore durante l\'eliminazione dell\'utente:', err);
+          this.showNotification('Errore durante l\'eliminazione dell\'utente', 'error');
+        }
+      });
     }
   }
 
