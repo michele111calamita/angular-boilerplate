@@ -4,6 +4,7 @@ import { LoginComponent } from './login/login.component';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserManagerComponent } from './user-manager/user-manager.component';
+import { ListaUtentiApiComponent } from './lista-utenti-api/lista-utenti-api.component';
 
 
 const routes: Routes = [
@@ -14,6 +15,10 @@ const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
+  },
+  {
+    path: 'lista-api',
+    loadComponent: () => import('./lista-utenti-api/lista-utenti-api.component').then(m => m.ListaUtentiApiComponent)
   },
   {
     path: 'user-manager',

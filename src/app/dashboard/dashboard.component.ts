@@ -3,13 +3,22 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { UserManagerComponent } from '../user-manager/user-manager.component';
-import { ListaUtentiComponent } from '../lista-utenti/lista-utenti.component';
+import { ListaUtentiApiComponent } from '../lista-utenti-api/lista-utenti-api.component';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, UserManagerComponent, ListaUtentiComponent],
+  imports: [CommonModule, MatButtonModule, UserManagerComponent, ListaUtentiApiComponent],
   template: `
-    <app-lista-utenti></app-lista-utenti>
+    <!-- Usa il componente UserManager come predefinito -->
+    <app-user-manager></app-user-manager>
+    
+    <!-- Pulsante per passare alla versione API -->
+    <div class="floating-menu">
+      <button mat-raised-button color="accent" (click)="navigateToListaApi()">
+        Versione API
+      </button>
+    </div>
   `,
   styles: [`
     .dashboard {
@@ -19,6 +28,12 @@ import { ListaUtentiComponent } from '../lista-utenti/lista-utenti.component';
     }
     h2 {
       margin-bottom: 16px;
+    }
+    .floating-menu {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
     }
   `]
 })
@@ -31,4 +46,7 @@ export class DashboardComponent {
     this.router.navigate(['/login']);      // 🚪 torna alla login
   }
   
+  navigateToListaApi() {
+    this.router.navigate(['/lista-api']);
+  }
 }

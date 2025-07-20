@@ -11,6 +11,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { UserService, User } from '../services/user.service';
+import { TrasfertaService, TrasfertaResponse } from '../services/trasferta.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-lista-utenti',
@@ -182,59 +184,60 @@ import { UserService, User } from '../services/user.service';
 })
 export class ListaUtentiComponent implements OnInit {
   loading = true;
-  users: any[] = [];
-  selected: string[] = [];
-  error = '';
+  users: User[] = [];
+  filteredUsersList: User[] = [];
+  selected: Record<string, boolean> = {};
   searchTerm = '';
   showForm = false;
-  editMode = false;
-  userIdCounter = 0;
-  editingUserId: number | null = null;
   showTrasfertaForm = false;
-
+  editMode = false;
+  userIdCounter = 1;
+  editingUserId: number | null = null;
   trasferte: string[] = [];
   trasferteUtenti: Record<string, string[]> = {};
   activeTrasferta: string = '';
-  newTrasfertaName = '';
+  error = '';
 
-  newUser = {
-    cognome: '', nome: '', dataNascita: '', luogoNascita: '',
-    codiceFiscale: '', numeroTessera: '', codiceSicurezza: ''
+  newTrasfertaName: string = '';
+  
+  newUser: User = {
+    id: 0,
+    cognome: '', 
+    nome: '', 
+    dataNascita: '', 
+    luogoNascita: '',
+    codiceFiscale: '', 
+    numeroTessera: '', 
+    codiceSicurezza: ''
   };
-  constructor(private http: HttpClient, private userService: UserService) {}  ngOnInit(): void {
+
+  constructor(
+    private userService: UserService
+  ) {}
+
+  ngOnInit() {
     this.loading = true;
     
-    // Carica dati localStorage esistenti
-    const savedSelected = localStorage.getItem('utentiSelezionati');
-    const storedTrasferte = localStorage.getItem('trasferte');
-    const storedMap = localStorage.getItem('trasferteUtenti');
-
-    if (savedSelected) {
-      this.selected = JSON.parse(savedSelected);
-    }
-
-    if (storedTrasferte) this.trasferte = JSON.parse(storedTrasferte);
-    if (storedMap) this.trasferteUtenti = JSON.parse(storedMap);
-    
-    // Carica utenti dall'API
-    this.userService.getUsers().subscribe({
-      next: (data) => {        this.users = data.map((user, index) => ({
-          id: user.id || index,
-          cognome: user.cognome || '',
-          nome: user.nome || '',
-          dataNascita: user.dataNascita || '',
-          luogoNascita: user.luogoNascita || '',
-          codiceFiscale: user.codiceFiscale || '',
-          numeroTessera: user.numeroTessera || '',
-          codiceSicurezza: user.codiceSicurezza || ''
-        }));
-        this.userIdCounter = this.users.reduce((max, u) => (u.id > max ? u.id : max), 0) + 1;
+    // Carica sia utenti che trasferte in parallelo
+    forkJoin({
+      users: this.userService.getUsers(),
+      trasferte: this.userService.getTrasferte()
+    }).subscribe({
+      next: (data) => {
+        this.users = data.users;
+        this.filteredUsersList = [...this.users];
+        this.userIdCounter = this.users.reduce((max, u) => Math.max(max, Number(u.id)), 0) + 1;
+        
+        this.trasferte = data.trasferte.trasferte;
+        this.trasferteUtenti = data.trasferte.trasferteUtenti;
+        
         this.loading = false;
+        // this.applyFilter(); // Remove or update if applyFilter uses filteredUsers
       },
       error: (err) => {
-        this.error = 'Errore nel caricamento utenti dal server';
+        console.error('Errore nel caricamento dati:', err);
+        this.error = 'Errore nel caricamento dati. Riprova più tardi.';
         this.loading = false;
-        console.error(err);
       }
     });
   }
@@ -278,6 +281,7 @@ export class ListaUtentiComponent implements OnInit {
 
   resetForm() {
     this.newUser = {
+      id: 0,
       cognome: '', nome: '', dataNascita: '', luogoNascita: '',
       codiceFiscale: '', numeroTessera: '', codiceSicurezza: ''
     };
@@ -289,10 +293,12 @@ export class ListaUtentiComponent implements OnInit {
     if (this.editMode && this.editingUserId !== null) {
       const index = this.users.findIndex(u => u.id === this.editingUserId);
       if (index !== -1) {
-        this.users[index] = { id: this.editingUserId, ...this.newUser };
+        const { id, ...rest } = this.newUser;
+        this.users[index] = { id: this.editingUserId, ...rest };
       }
     } else {
-      this.users.push({ id: this.userIdCounter++, ...this.newUser });
+      const { id, ...userWithoutId } = this.newUser;
+      this.users.push({ id: this.userIdCounter++, ...userWithoutId });
     }
     this.saveToLocalStorage();
     this.resetForm();
@@ -308,21 +314,21 @@ export class ListaUtentiComponent implements OnInit {
 
   deleteUser(id: number) {
     this.users = this.users.filter(u => u.id !== id);
-    this.selected = this.selected.filter(s => s !== String(id));
+    delete this.selected[String(id)];
     this.saveToLocalStorage();
   }
 
   onCheckboxChange(checked: boolean, id: number) {
     if (checked) {
-      this.selected.push(String(id));
+      this.selected[String(id)] = true;
     } else {
-      this.selected = this.selected.filter(s => s !== String(id));
+      delete this.selected[String(id)];
     }
     this.saveToLocalStorage();
   }
 
   isSelected(id: number): boolean {
-    return this.selected.includes(String(id));
+    return !!this.selected[String(id)];
   }
 
   trackByUserId(index: number, item: any): number {
@@ -343,7 +349,7 @@ export class ListaUtentiComponent implements OnInit {
   
 
   exportLista() {
-    const lista = this.users.filter(u => this.selected.includes(String(u.id)));
+    const lista = this.users.filter(u => this.selected[String(u.id)]);
     const ws = XLSX.utils.json_to_sheet(lista);
     ws['!cols'] = [
       { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 20 },
